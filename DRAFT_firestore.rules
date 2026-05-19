@@ -1,0 +1,80 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isValidId(id) { 
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); 
+    }
+    function isSignedIn() { 
+      return request.auth != null; 
+    }
+    function isOwner(userId) { 
+      return isSignedIn() && request.auth.uid == userId; 
+    }
+    function isVerified() {
+      return request.auth.token.email_verified == true;
+    }
+
+    // User Validation
+    function isValidUser(data) {
+      return data.keys().hasAll(['userId', 'name', 'email', 'createdAt']) &&
+             data.keys().size() <= 6 &&
+             data.userId == request.auth.uid &&
+             data.name is string && data.name.size() <= 100 &&
+             data.email is string && data.email.size() <= 100 &&
+             data.createdAt == request.time;
+    }
+
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && isVerified() && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && 
+                      isValidUser(request.resource.data) &&
+                      request.resource.data.userId == resource.data.userId &&
+                      request.resource.data.createdAt == resource.data.createdAt &&
+                      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'goals']);
+    }
+
+    // Activity Validation
+    function isValidActivity(data) {
+      return data.keys().hasAll(['userId', 'type', 'value', 'timestamp']) &&
+             data.keys().size() <= 6 &&
+             data.userId == request.auth.uid &&
+             data.type in ['screen_time', 'sleep', 'exercise', 'reading', 'water', 'meditation', 'other'] &&
+             data.value is number &&
+             data.timestamp is timestamp;
+    }
+
+    match /activities/{activityId} {
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow get: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isVerified() && isValidActivity(request.resource.data);
+      allow update: if false; // Activities are immutable for now
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // Insight Validation
+    function isValidInsight(data) {
+      return data.keys().hasAll(['userId', 'pattern', 'summary', 'suggestions', 'createdAt']) &&
+             data.keys().size() <= 6 &&
+             data.userId == request.auth.uid &&
+             data.pattern in ['positive', 'negative', 'neutral'] &&
+             data.summary is string && data.summary.size() <= 2000 &&
+             data.suggestions is list && data.suggestions.size() <= 20 &&
+             data.createdAt == request.time;
+    }
+
+    match /insights/{insightId} {
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow get: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isVerified() && isValidInsight(request.resource.data);
+      allow update: if false; // Insights are immutable
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+  }
+}

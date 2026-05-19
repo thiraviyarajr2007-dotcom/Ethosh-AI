@@ -1,0 +1,118 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Stores user preferences, goals, and basic info.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "goals": { "type": "array", "items": { "type": "string" } },
+        "onboarded": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "name", "email"]
+    },
+    "Habit": {
+      "title": "Habit Protocol",
+      "description": "A specific habit node the user is monitoring.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "category": { "type": "string", "enum": ["screen_time", "sleep", "exercise", "reading", "water", "meditation", "nutrition", "other"] },
+        "goalValue": { "type": "number" },
+        "goalUnit": { "type": "string" },
+        "isNegative": { "type": "boolean" },
+        "active": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "name", "category", "goalValue", "goalUnit"]
+    },
+    "DailyLog": {
+      "title": "Daily Metric Log",
+      "description": "Aggregated daily data for a habit.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Date string YYYY-MM-DD" },
+        "userId": { "type": "string" },
+        "habitId": { "type": "string" },
+        "value": { "type": "number" },
+        "unit": { "type": "string" },
+        "note": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "habitId", "value", "unit"]
+    },
+    "UserAlert": {
+      "title": "System Alert",
+      "description": "Pattern detection alert triggered by the system.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "habitId": { "type": "string" },
+        "type": { "type": "string", "enum": ["threshold_exceeded", "consistency_drop", "custom"] },
+        "message": { "type": "string" },
+        "severity": { "type": "string", "enum": ["low", "medium", "high"] },
+        "read": { "type": "boolean" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "habitId", "type", "message", "severity"]
+    },
+    "ActivityLog": {
+      "title": "Activity Log",
+      "description": "A single entry for a tracked habit or activity.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "type": { "type": "string" },
+        "label": { "type": "string" },
+        "value": { "type": "number" },
+        "unit": { "type": "string" },
+        "note": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "type", "value", "timestamp"]
+    },
+    "Insight": {
+      "title": "AI Insight",
+      "description": "Generated analysis of the user's habits.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "pattern": { "type": "string", "enum": ["positive", "negative", "neutral"] },
+        "summary": { "type": "string" },
+        "suggestions": { "type": "array", "items": { "type": "string" } },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "pattern", "summary", "createdAt"]
+    }
+  },
+  "firestore": {
+    "users": {
+      "schema": "User",
+      "description": "Global user profiles"
+    },
+    "users/{userId}/habits": {
+      "schema": "Habit",
+      "description": "User specific habit nodes"
+    },
+    "users/{userId}/dailyLogs": {
+      "schema": "DailyLog",
+      "description": "Aggregated daily habit metrics"
+    },
+    "users/{userId}/alerts": {
+      "schema": "UserAlert",
+      "description": "System generated alerts for the user"
+    },
+    "activities": {
+      "schema": "ActivityLog",
+      "description": "Logs of all activities"
+    },
+    "insights": {
+      "schema": "Insight",
+      "description": "AI generated insights"
+    }
+  }
+}

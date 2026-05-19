@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  --color-bg-main: #09090B;
+  --color-bg-card: #121214;
+  --color-bg-hover: #18181B;
+  --color-border-main: #27272A;
+  --color-text-main: #FFFFFF;
+  --color-text-muted: #A1A1AA;
+  
+  /* Brand Colors from HTML */
+  --color-accent: #1D9E75;
+  --color-accent-dim: rgba(29, 158, 117, 0.1);
+  --color-purple: #7F77DD;
+  --color-purple-dim: rgba(127, 119, 221, 0.1);
+  --color-coral: #D85A30;
+  --color-coral-dim: rgba(216, 90, 48, 0.1);
+  --color-amber: #BA7517;
+  --color-amber-dim: rgba(186, 117, 23, 0.1);
+  --color-error: #f43f5e;
+  
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+}
+
+@layer base {
+  body {
+    @apply bg-bg-main text-text-muted font-sans antialiased text-sm;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-text-main;
+  }
+}
+
+.glass-morphism {
+  @apply bg-bg-main/50 backdrop-blur-md border border-border-main;
+}
+
+.data-card {
+  @apply bg-bg-card rounded-2xl border border-border-main p-5 transition-all duration-200 hover:border-accent/30;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.sidebar-item {
+  @apply px-3 py-2 rounded-md transition-colors text-text-muted hover:text-text-main cursor-pointer flex items-center gap-2;
+}
+
+.sidebar-item.active {
+  @apply bg-accent-dim text-accent;
+}

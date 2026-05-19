@@ -1,0 +1,6 @@
+{
+  "name": "Ethos AI",
+  "description": "An AI-powered habit monitoring system that integrates with Google Fit and wearable devices via Bluetooth to analyze behavior patterns and provide personalized wellness suggestions.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
